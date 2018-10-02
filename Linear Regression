@@ -1,0 +1,78 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+
+#load data set
+def loadDataSet(data):
+    dataset = np.loadtxt(fname =data)
+    x = dataset[:,0:2]
+    y = dataset[:,2]
+    #print(x[:,0]*x[:,1])
+    plt.scatter((x[:,1]),y)
+    plt.title("Scatter Plot of Data")
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.show()
+    return x,y
+#normal function ((X'X)^-1)*X'y estimation
+def normalFunction(x, y):
+    xtx_inverse =np.linalg.inv(np.matmul(np.transpose(x),x))
+    print(xtx_inverse)
+    print(np.shape(x))
+    theta = np.matmul(np.matmul(xtx_inverse,np.transpose(x)),y)
+  #  plt.plot(theta)
+   # plt.scatter((x[:,0]*x[:,1]),y)
+    axes=plt.gca()
+    xvals = np.array(axes.get_xlim())
+    plt.scatter((x[:,0]*x[:,1]),y)
+    plt.plot(xvals , theta[0]+theta[1]*xvals)
+    plt.title("Normal")
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.show()
+    
+#calculate the gradient of the data given several trials
+def gradient( xdata, ydata,base_slope, base_intercept, rate, epoch):
+   
+    
+    for l in range(epoch):
+        slope_change=0
+        intercept_change=0
+        for i in range(len(ydata)):
+            x = xdata[i]
+            #
+            print(xdata[i])
+            y = ydata[i]
+            #yhat =mx+b
+            guess = base_slope*x+base_intercept
+            #actual - yhat
+            error = y-guess
+            #m = m+rate(y-mx+b)*x
+            slope_change +=error*x*rate
+            #b = b+(y-mx+b)*rate
+            intercept_change +=error*rate
+        #print(l)
+    #print("slope",base_slope)
+    #print("intercept",base_intercept)
+    axes=plt.gca()
+    xvals = np.array(axes.get_xlim())
+    plt.scatter(xdata,ydata)
+    plt.plot(xdata , (base_slope*xdata+base_intercept))
+
+    return  base_slope, base_intercept
+
+
+def setupthetas(numofthetas):
+    thetas =[0]
+    for x in range(numofthetas):
+        thetas.append(0)
+    plt.plot(epochchange,errorchange)
+    plt.title("Error change over epoch's")
+    plt.xlabel("epoch")
+    plt.ylabel("error")
+    plt.show()
+    return  base_slope, base_intercept
+    
+Stuffx, Stuffy = loadDataSet("Q2data.txt")
+normal = normalFunction(Stuffx,Stuffy)
+#gradienttheta= stoch_gradient(Stuffx[:,1],Stuffy, 0,0, .001,1000)
