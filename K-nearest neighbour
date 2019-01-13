@@ -1,0 +1,146 @@
+__author__ = 'Aiden_Smith'
+import numpy as np
+import csv
+import pandas as pd
+import matplotlib.pyplot as plt
+import random
+#more importants
+
+def read_csv(file):
+    csv_data = pd.read_csv(file,sep='\t', lineterminator='\r')
+    #print(csv_data)
+    #print(csv_data)
+    stuff = np.array(csv_data)
+    zeros=0
+    for i in stuff[:,100]:
+        if(i==0):
+            zeros+=1
+    random.shuffle(stuff)
+    print(stuff[:,100])
+    return stuff
+
+#data is the full training numpy array
+#currenti is the current iteration of cross validation
+#kfold is the total number of cross validation folds
+
+
+def fold(data, currenti, kfold):
+    print("folding")
+    rowsize = (np.shape(data)[0])
+    kfolds=[]
+    for x in range(kfold):
+        x=x+1
+        #kfolds.append[(x*(rowsize/kfolds)),:]
+        kfolds.append(data[int((x-1)*(rowsize/kfold)):int(x*(rowsize/kfold)),:])
+        #print((x-1)*(rowsize/kfold)),(x*(rowsize/kfold))
+    testing = pd.DataFrame(kfolds[currenti])
+    print("kfold before: ",np.shape(kfold))
+    del kfolds[currenti]
+    training = pd.DataFrame(kfolds[0])
+    print("BEFORE")
+    for x in range(1,len(kfolds)):
+        training=pd.DataFrame.append(training, pd.DataFrame(kfolds[x]))
+        print("x",np.shape(x))
+    training= training.reset_index(drop=True)
+    training=np.array(training)
+    testing =np.array(testing)
+    print("kfold after: ",np.shape(kfold))
+    print("TESTING: ",np.shape(testing))
+    print("TRAINING: ",np.shape(training))
+    return training, testing
+
+
+#training is the numpy array of training data
+#(you run through each testing point and classify based on the training points)
+#testing is a numpy array, use this method to predict 1 or 0 for each of the testing points
+#k is the number of neighboring points to take into account when predicting the label
+
+def classify(training, testing, k):
+    
+    #print("Training",len(training))
+    rating =[]
+    #print("TESTING LEN:",len(testing))
+    for l in range(len(testing)):
+    #for l in range(2):
+        distances = []
+        targets = []
+        zeros=0
+        for i in range(len(training)):
+           # for i in range(len(test)):
+            #for x in range(len(testing)):
+                distance = np.sqrt(np.sum(np.square(testing[l]-training[i, :])))
+                distances.append([distance,i])
+                #print(distance)
+        #print("shape of distance: ", np.shape(distances))
+        #print("Distances: ",l," ", distances)
+        stuff=pd.DataFrame(distances)
+        #whatisthe thing we are using to classify?
+        distances = sorted(distances)
+        for i in range(k):
+            index = distances[i][1]
+            targets.append(training[index,100])
+        percentage_count =0
+        for x in range(len(targets)):
+            if(targets[x]==0):
+                zeros+=1
+        percentage=(zeros/np.shape(targets)[0])
+        if(percentage>.5):
+            rating.append(0)
+            #print("zeros",zeros,"percentage",percentage, " : 0")
+        else: 
+            rating.append(1)
+    return rating
+        
+        
+        
+#predictions is a numpy array of 1s and 0s for the class prediction
+#labels is a numpy array of 1s and 0s for the true class label
+def calc_accuracy(predictions, labels):
+    sum=0
+    for x in range(len(predictions)):
+        if(predictions[x]==labels[x]):
+            sum=sum+1
+    print("percentage correct: ",sum/len(predictions))
+    return sum/len(predictions)
+            
+#using 6 different k values
+
+def findBestK(data, kfold):
+
+    ##--- please revise the following code to try a range of K values and return the best K 
+    ##please draw a bar graph to show CV-accuracy vs. K
+    k = [3,5,7,9,11,13]
+    #k=[3,5]
+    accuracy=[]
+    max_accuracy = 0
+    
+    sum = 0    
+    for i in k:
+        currentaccuracy=0
+        for t in range(0,3):
+            training, testing = fold(data, t, 4)
+            predictions = classify(training, testing, i)
+            labels = testing[:,99]
+            currentaccuracy+=calc_accuracy(predictions, labels)
+            print("accuracy= ",currentaccuracy/4, "in: ",k)
+        if((currentaccuracy/4)>max_accuracy):
+            max_accuracy = currentaccuracy/4
+        accuracy.append(currentaccuracy/4)
+    plt.bar(k,accuracy)
+    ##--- please revise the above code according to the HW3 requirements
+
+
+if __name__ == "__main__":
+    filename = "Movie_Review_Data.txt"
+    #read_csv(filename)
+    data = np.asarray(read_csv(filename))
+    findBestK(data,0)
+    #training, testing = fold(data,2,4)
+    #classification = classify(training, testing, 20)
+    #calc_accuracy(classification, training[:,-1])
+    #print("LMAO")
+    
+    #kfold = 4
+    #findBestK(data, kfold)
+    
+    
