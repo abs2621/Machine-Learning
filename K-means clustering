@@ -1,0 +1,72 @@
+#!/usr/bin/python
+
+import sys
+
+def loadData(fileDj):
+    data = []
+    #Your code here
+    return data
+
+## K-means functions 
+
+def getInitialCentroids(X, k):
+    initialCentroids = {}
+    #Your code here
+    return initialCentroids
+
+def getDistance(pt1,pt2):
+    dist = 0
+    #Your code here
+    return dist
+
+def allocatePoints(X,clusters):
+    #Your code here
+    return clusters
+
+def updateCentroids(clusters):
+    #Your code here
+    return clusters
+
+
+def visualizeClusters(clusters):
+    #Your code here
+
+
+def kmeans(X, k, maxIter=1000):
+    clusters = getInitialCentroids(X,k)
+    clusters = allocatePoints(X,clusters)
+    clusters = updateCentroids(clusters)
+    #Your code here
+    return clusters
+
+
+def kneeFinding(X,kList):
+    #Your code here
+
+def purity(X, clusters):
+    purities = []
+    #Your code here
+    return purities
+
+
+
+
+
+def main():
+    #######dataset path
+    datadir = sys.argv[1]
+    pathDataset1 = datadir+'/humanData.txt'
+    pathDataset2 = datadir+'/audioData.txt'
+    dataset1 = loadData(pathDataset1)
+    dataset2 = loadData(pathDataset2)
+
+    #Q4
+    kneeFinding(dataset1,range(1,7))
+
+    #Q5
+    clusters = kmeans(dataset1, 2, maxIter=1000)
+    purity(dataset1,clusters)
+
+
+if __name__ == "__main__":
+    main()
